@@ -1,52 +1,91 @@
-# Solving an SDG Problem with Data (Choose Your SDG)
+Patients ----< Appointments >---- Healthcare_Facilities ----< Doctors
+   |                           |
+  ID (PK)                 Facility_ID (FK)
+  Name                      Patient_ID (FK)
+  Age                       Doctor_ID (FK)
+  Location                  Appointment_Date
+  Income_Level
 
-## Overview
-Select a Sustainable Development Goal (SDG) that resonates with you and develop a data-driven solution to address a specific problem within that SDG. Design a database, perform data analysis, and use Microsoft Excel as the user interface.
 
-## Objectives
-- Choose an SDG and identify a specific problem to address.
-- Design and implement a relational database relevant to your chosen problem.
-- Write SQL queries to retrieve and analyze data.
-- Use Microsoft Excel for data visualization and analysis.
+-- Create Patients Table
+CREATE TABLE Patients (
+    patient_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    age INT,
+    location VARCHAR(255),
+    income_level VARCHAR(50)
+);
 
-## Requirements
+-- Create Healthcare Facilities Table
+CREATE TABLE Healthcare_Facilities (
+    facility_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    location VARCHAR(255),
+    type VARCHAR(50)
+);
 
-### Part 1: SDG Selection and Problem Definition
-- **SDG Selection:** Choose an SDG (e.g., SDG 3: Good Health, SDG 7: Affordable and Clean Energy).
-- **Problem Definition:** Define a specific problem within your chosen SDG that can be addressed using data.
+-- Create Doctors Table
+CREATE TABLE Doctors (
+    doctor_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    specialty VARCHAR(50),
+    facility_id INT,
+    FOREIGN KEY (facility_id) REFERENCES Healthcare_Facilities(facility_id)
+);
 
-### Part 2: Database Design
-- **ERD:** Design an ERD for your project, including entities relevant to your SDG problem.
-- **Schema:** Write SQL statements to create the database schema based on your ERD.
-- **Sample Data:** Populate the database with relevant sample data.
+-- Create Appointments Table
+CREATE TABLE Appointments (
+    appointment_id INT PRIMARY KEY,
+    patient_id INT,
+    facility_id INT,
+    doctor_id INT,
+    appointment_date DATE,
+    FOREIGN KEY (patient_id) REFERENCES Patients(patient_id),
+    FOREIGN KEY (facility_id) REFERENCES Healthcare_Facilities(facility_id),
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id)
+);
 
-### Part 3: SQL Programming
-- **Data Retrieval:** Write SQL queries to retrieve relevant data based on your problem definition.
-- **Data Analysis:** Write SQL queries to analyze data and generate insights related to your SDG problem.
 
-### Part 4: Data Analysis Using Excel
-- **Import Data:** Import data from your database into Excel.
-- **Analysis:** Analyze the data using pivot tables, charts, and other Excel tools.
-- **Dashboard:** Create an interactive Excel dashboard to visualize key insights.
+-- Insert sample data into Patients table
+INSERT INTO Patients (patient_id, name, age, location, income_level)
+VALUES
+(1, 'Alice Johnson', 30, 'Rural Area A', 'Low'),
+(2, 'Bob Smith', 45, 'Rural Area B', 'Middle'),
+(3, 'Charlie Lee', 65, 'Urban Area C', 'High');
 
-### Part 5: Integration and Testing
-- **Integration:** Document the process of importing data into Excel and ensuring consistency.
-- **Testing:** Test the integration and functionality of your Excel dashboard.
+-- Insert sample data into Healthcare_Facilities table
+INSERT INTO Healthcare_Facilities (facility_id, name, location, type)
+VALUES
+(1, 'Rural Clinic A', 'Rural Area A', 'Clinic'),
+(2, 'Urban Hospital B', 'Urban Area C', 'Hospital'),
+(3, 'Rural Clinic B', 'Rural Area B', 'Clinic');
 
-### Part 6: Presentation
-- **Pitch Deck:** Develop a 10-slide PowerPoint presentation as taught in the entrepreneurship module covering:
-  - Project overview and SDG alignment.
-  - Problem definition and significance.
-  - Database design and schema.
-  - Data analysis insights.
-  - Excel dashboard demonstration.
-- **Delivery:** Present your pitch deck, demonstrating how your project addresses the SDG problem.
+-- Insert sample data into Doctors table
+INSERT INTO Doctors (doctor_id, name, specialty, facility_id)
+VALUES
+(1, 'Dr. John Doe', 'General Practitioner', 1),
+(2, 'Dr. Jane Smith', 'Pediatrician', 2),
+(3, 'Dr. Sam Green', 'Surgeon', 3);
 
-## Deliverables (upload onto this repo)
-- SDG problem definition document
-- ERD
-- SQL scripts
-- Excel workbook with data analysis and dashboard
-- Integration documentation
-- Pitch deck presentation (Provide the link e.g Canva or Gamma in your documentation)
+-- Insert sample data into Appointments table
+INSERT INTO Appointments (appointment_id, patient_id, facility_id, doctor_id, appointment_date)
+VALUES
+(1, 1, 1, 1, '2025-01-10'),
+(2, 2, 2, 2, '2025-01-12'),
+(3, 3, 3, 3, '2025-01-15');
+
+SELECT * FROM Patients
+WHERE location LIKE '%Rural%';
+
+SELECT h.name AS Facility, COUNT(a.patient_id) AS Patients_Served
+FROM Healthcare_Facilities h
+LEFT JOIN Appointments a ON h.facility_id = a.facility_id
+GROUP BY h.name;
+
+SELECT h.name AS Facility, d.specialty, COUNT(*) AS Specialty_Count
+FROM Healthcare_Facilities h
+JOIN Doctors d ON h.facility_id = d.facility_id
+GROUP BY h.name, d.specialty
+ORDER BY COUNT(*) DESC;
+
 
